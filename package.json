@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Chrome extension development foundation.",
   "scripts": {
-    "test": "node --test ./tests/unit/manifest.test.js ./tests/unit/prompt-form.test.js ./tests/integration/extension-files.test.js ./tests/e2e/load-extension.test.js",
-    "test:coverage": "node --test --experimental-test-coverage ./tests/unit/manifest.test.js ./tests/unit/prompt-form.test.js ./tests/integration/extension-files.test.js ./tests/e2e/load-extension.test.js"
+    "test": "node --test ./tests/unit/*.test.js ./tests/integration/*.test.js ./tests/e2e/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage ./tests/unit/*.test.js ./tests/integration/*.test.js ./tests/e2e/*.test.js"
   },
   "engines": {
     "node": ">=22"

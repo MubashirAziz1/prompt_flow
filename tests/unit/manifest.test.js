@@ -43,4 +43,20 @@ describe("manifest.json (unit)", () => {
     assert.ok(manifest.side_panel.default_path.endsWith(".html"));
     assert.equal(manifest.action?.default_popup, undefined);
   });
+
+  it("stores settings locally and allows OpenAI and OpenRouter hosts only", () => {
+    const manifest = readManifest();
+
+    assert.ok(manifest.permissions.includes("storage"));
+    assert.equal(typeof manifest.options_ui?.page, "string");
+    assert.ok(manifest.options_ui.page.endsWith(".html"));
+    assert.ok(Array.isArray(manifest.host_permissions));
+    assert.ok(
+      manifest.host_permissions.includes("https://api.openai.com/v1/*")
+    );
+    assert.ok(
+      manifest.host_permissions.includes("https://openrouter.ai/api/v1/*")
+    );
+    assert.ok(!manifest.host_permissions.includes("<all_urls>"));
+  });
 });

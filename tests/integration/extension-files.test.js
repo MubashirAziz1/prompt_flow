@@ -35,6 +35,10 @@ function referencedPaths(manifest) {
     paths.push(manifest.side_panel.default_path);
   }
 
+  if (manifest.options_ui?.page) {
+    paths.push(manifest.options_ui.page);
+  }
+
   for (const size of Object.keys(manifest.icons ?? {})) {
     paths.push(manifest.icons[size]);
   }
@@ -146,5 +150,33 @@ describe("extension files (integration)", () => {
       existsSync(join(panelDir, stylesheetHref)),
       `Missing ${stylesheetHref}`
     );
+  });
+
+  it("keeps provider HTTP logic out of the side panel UI", () => {
+    const panelJs = readFileSync(extensionFile("sidepanel/sidepanel.js"), "utf8");
+    const formJs = readFileSync(extensionFile("sidepanel/prompt-form.js"), "utf8");
+    const flowJs = readFileSync(
+      extensionFile("sidepanel/enhance-flow.js"),
+      "utf8"
+    );
+
+    for (const source of [panelJs, formJs, flowJs]) {
+      assert.doesNotMatch(source, /openai\.js/);
+      assert.doesNotMatch(source, /openrouter\.js/);
+      assert.doesNotMatch(source, /api\.openai\.com/);
+      assert.doesNotMatch(source, /openrouter\.ai/);
+    }
+  });
+
+  it("settings page asks only for an API key", () => {
+    const html = readFileSync(extensionFile("settings/settings.html"), "utf8");
+
+    assert.match(html, /<input\b[^>]*\bid=["']api-key-input["']/i);
+    assert.match(html, /<button\b[^>]*\bid=["']save-settings["']/i);
+    assert.match(html, /type=["']password["']/i);
+    assert.match(html, /<script\b[^>]*\bsrc=/i);
+    assert.doesNotMatch(html, /id=["']provider-select["']/i);
+    assert.doesNotMatch(html, /id=["']model-input["']/i);
+    assert.doesNotMatch(html, /id=["']system-prompt-input["']/i);
   });
 });

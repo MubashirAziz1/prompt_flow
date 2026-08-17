@@ -3,7 +3,15 @@
   "name": "Prompt Enhancer",
   "version": "0.1.0",
   "description": "Development foundation for the Prompt Enhancer Chrome extension.",
-  "permissions": ["sidePanel"],
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": [
+    "https://api.openai.com/v1/*",
+    "https://openrouter.ai/api/v1/*"
+  ],
+  "options_ui": {
+    "page": "settings/settings.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "background/service-worker.js",
     "type": "module"

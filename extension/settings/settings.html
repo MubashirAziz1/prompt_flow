@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prompt Enhancer Settings</title>
+    <link rel="stylesheet" href="../sidepanel/sidepanel.css">
+    <link rel="stylesheet" href="settings.css">
+  </head>
+  <body>
+    <main class="panel settings-panel">
+      <h1>Settings</h1>
+      <p class="hint">
+        Your API key stays on this device and is sent only to
+        <span id="active-provider-label"></span>.
+      </p>
+
+      <label for="api-key-input">API key</label>
+      <input
+        id="api-key-input"
+        name="apiKey"
+        type="password"
+        autocomplete="off"
+        spellcheck="false"
+      >
+
+      <button type="button" id="save-settings">Save</button>
+      <p id="settings-status" class="status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="settings.js"></script>
+  </body>
+</html>

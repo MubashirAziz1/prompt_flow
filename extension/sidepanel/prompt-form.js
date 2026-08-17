@@ -7,6 +7,6 @@ export function bindPromptForm({ promptInput, actionButton, onSubmit }) {
       return;
     }
 
-    onSubmit?.(prompt);
+    return onSubmit?.(prompt);
   });
 }

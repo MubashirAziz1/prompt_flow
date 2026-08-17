@@ -47,6 +47,19 @@ body {
   padding: 16px;
 }
 
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-header a {
+  color: var(--accent);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
 h1 {
   margin: 0;
   font-size: 1.125rem;
@@ -91,4 +104,16 @@ button {
 
 button:hover {
   filter: brightness(1.05);
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.status {
+  min-height: 1.2em;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
 }
