@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Prompt Enhancer",
+  "version": "0.1.0",
+  "description": "Development foundation for the Prompt Enhancer Chrome extension.",
+  "permissions": ["sidePanel"],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "action": {},
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  }
+}

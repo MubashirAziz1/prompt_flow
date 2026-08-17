@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+.chrome-test-profile/
+.env
+.env.*
+*.log
+.cursor
+

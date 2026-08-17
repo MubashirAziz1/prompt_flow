@@ -1,0 +1,14 @@
+{
+  "name": "prompt-enhancer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Chrome extension development foundation.",
+  "scripts": {
+    "test": "node --test ./tests/unit/manifest.test.js ./tests/unit/prompt-form.test.js ./tests/integration/extension-files.test.js ./tests/e2e/load-extension.test.js",
+    "test:coverage": "node --test --experimental-test-coverage ./tests/unit/manifest.test.js ./tests/unit/prompt-form.test.js ./tests/integration/extension-files.test.js ./tests/e2e/load-extension.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
