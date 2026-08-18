@@ -1,1 +1,1 @@
-export const ACTIVE_PROVIDER_ID = "openai";
+export const ACTIVE_PROVIDER_ID = "openrouter";

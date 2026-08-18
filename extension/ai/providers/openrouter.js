@@ -4,7 +4,7 @@ export function createOpenRouterProvider() {
   return createOpenAiCompatibleProvider({
     id: "openrouter",
     label: "OpenRouter",
-    defaultModel: "openai/gpt-4o-mini",
+    defaultModel: "nvidia/nemotron-3.5-lightning:free",
     baseUrl: "https://openrouter.ai/api/v1",
     extraHeaders() {
       return {

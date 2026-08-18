@@ -5,7 +5,6 @@
   "description": "Development foundation for the Prompt Enhancer Chrome extension.",
   "permissions": ["sidePanel", "storage"],
   "host_permissions": [
-    "https://api.openai.com/v1/*",
     "https://openrouter.ai/api/v1/*"
   ],
   "options_ui": {

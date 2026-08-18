@@ -152,6 +152,22 @@ describe("extension files (integration)", () => {
     );
   });
 
+  it("does not ship an OpenAI provider module", () => {
+    assert.equal(existsSync(extensionFile("ai/providers/openai.js")), false);
+    assert.equal(existsSync(extensionFile("ai/providers/openrouter.js")), true);
+
+    const registry = readFileSync(
+      extensionFile("ai/providers/registry.js"),
+      "utf8"
+    );
+    assert.doesNotMatch(registry, /openai\.js/);
+    assert.match(registry, /openrouter\.js/);
+
+    const config = readFileSync(extensionFile("ai/provider-config.js"), "utf8");
+    assert.match(config, /openrouter/);
+    assert.doesNotMatch(config, /["']openai["']/);
+  });
+
   it("keeps provider HTTP logic out of the side panel UI", () => {
     const panelJs = readFileSync(extensionFile("sidepanel/sidepanel.js"), "utf8");
     const formJs = readFileSync(extensionFile("sidepanel/prompt-form.js"), "utf8");

@@ -38,32 +38,32 @@ describe("settings store (unit)", () => {
     assert.deepEqual(storage.snapshot()[SETTINGS_STORAGE_KEY], saved);
   });
 
-  it("merges updates without dropping the other provider's key", async () => {
+  it("merges updates without dropping another stored key", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
 
     await store.save({
-      apiKeys: { openai: "sk-openai", openrouter: "sk-or" },
+      apiKeys: { other: "sk-other", openrouter: "sk-or" },
     });
 
     const saved = await store.save({
       apiKeys: { openrouter: "sk-or-new" },
     });
 
-    assert.equal(saved.apiKeys.openai, "sk-openai");
+    assert.equal(saved.apiKeys.other, "sk-other");
     assert.equal(saved.apiKeys.openrouter, "sk-or-new");
   });
 
   it("clears a provider key when the saved value is blank", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
     await store.save({
-      apiKeys: { openai: "sk-keep", openrouter: "sk-or" },
+      apiKeys: { other: "sk-keep", openrouter: "sk-or" },
     });
 
     const saved = await store.save({
       apiKeys: { openrouter: "   " },
     });
 
-    assert.equal(saved.apiKeys.openai, "sk-keep");
+    assert.equal(saved.apiKeys.other, "sk-keep");
     assert.equal(saved.apiKeys.openrouter, undefined);
   });
 
@@ -72,7 +72,7 @@ describe("settings store (unit)", () => {
     const store = createSettingsStore({ storage });
 
     const saved = await store.save({
-      apiKeys: { openai: "sk-local-only" },
+      apiKeys: { openrouter: "sk-local-only" },
     });
 
     assert.equal(saved.backend, undefined);
@@ -86,13 +86,13 @@ describe("settings store (unit)", () => {
     });
 
     await store.save({
-      apiKeys: { openai: "sk-chrome" },
+      apiKeys: { openrouter: "sk-chrome" },
     });
 
     const loaded = await store.load();
-    assert.equal(loaded.apiKeys.openai, "sk-chrome");
+    assert.equal(loaded.apiKeys.openrouter, "sk-chrome");
     assert.equal(
-      chromeStorage.snapshot()[SETTINGS_STORAGE_KEY].apiKeys.openai,
+      chromeStorage.snapshot()[SETTINGS_STORAGE_KEY].apiKeys.openrouter,
       "sk-chrome"
     );
   });

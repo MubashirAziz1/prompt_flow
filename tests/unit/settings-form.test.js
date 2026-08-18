@@ -32,7 +32,7 @@ async function bind(store, getActiveProvider) {
 }
 
 describe("settings form (unit)", () => {
-  it("loads the API key for the active provider and shows its name", async () => {
+  it("loads the API key for OpenRouter and shows its name", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
     await store.save({
       apiKeys: { openai: "sk-saved", openrouter: "sk-or-saved" },
@@ -40,24 +40,24 @@ describe("settings form (unit)", () => {
 
     const form = await bind(store);
 
-    assert.equal(form.apiKeyInput.value, "sk-saved");
-    assert.match(form.providerLabel.textContent, /openai/i);
-    assert.equal(ACTIVE_PROVIDER_ID, "openai");
+    assert.equal(form.apiKeyInput.value, "sk-or-saved");
+    assert.match(form.providerLabel.textContent, /openrouter/i);
+    assert.equal(ACTIVE_PROVIDER_ID, "openrouter");
   });
 
-  it("saves only the active provider API key", async () => {
+  it("saves only the OpenRouter API key", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
     await store.save({
-      apiKeys: { openrouter: "sk-or" },
+      apiKeys: { openai: "sk-openai" },
     });
     const form = await bind(store);
 
-    form.apiKeyInput.value = "sk-new";
+    form.apiKeyInput.value = "sk-or-new";
     await form.saveButton.listeners.click();
 
     const saved = await store.load();
-    assert.equal(saved.apiKeys.openai, "sk-new");
-    assert.equal(saved.apiKeys.openrouter, "sk-or");
+    assert.equal(saved.apiKeys.openrouter, "sk-or-new");
+    assert.equal(saved.apiKeys.openai, "sk-openai");
     assert.equal(saved.systemPrompt, undefined);
     assert.equal(saved.models, undefined);
     assert.match(form.statusElement.textContent, /saved/i);

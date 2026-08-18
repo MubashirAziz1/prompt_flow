@@ -102,6 +102,7 @@ describe("unpacked extension load (e2e)", () => {
           {
             expression: `({
               providerSelect: Boolean(document.querySelector('#provider-select')),
+              providerLabel: document.querySelector('#active-provider-label')?.textContent?.trim() ?? '',
               apiKey: document.querySelector('#api-key-input')?.type ?? '',
               model: Boolean(document.querySelector('#model-input')),
               systemPrompt: Boolean(document.querySelector('#system-prompt-input')),
@@ -112,7 +113,7 @@ describe("unpacked extension load (e2e)", () => {
           sessionId
         );
         ui = result.value;
-        if (ui.apiKey && ui.save) {
+        if (ui.apiKey && ui.save && ui.providerLabel) {
           break;
         }
         await delay(200);
@@ -121,6 +122,7 @@ describe("unpacked extension load (e2e)", () => {
       assert.equal(ui.apiKey, "password");
       assert.equal(ui.save, true);
       assert.equal(ui.providerSelect, false);
+      assert.match(ui.providerLabel, /openrouter/i);
       assert.equal(ui.model, false);
       assert.equal(ui.systemPrompt, false);
     });

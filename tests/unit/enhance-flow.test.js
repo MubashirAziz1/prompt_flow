@@ -17,8 +17,7 @@ describe("enhance flow (unit)", () => {
   it("writes the model response to the output area", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
     await store.save({
-      providerId: "openai",
-      apiKeys: { openai: "sk-test" },
+      apiKeys: { openrouter: "sk-or-test" },
     });
     const fetchImpl = createFakeFetch(() =>
       chatCompletionResponse("polished prompt")

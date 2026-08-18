@@ -19,18 +19,19 @@ function expectedMessages(userPrompt, systemPrompt = DEFAULT_SYSTEM_PROMPT) {
 }
 
 describe("AI engine (unit)", () => {
-  it("uses the active provider default model and developer system prompt", async () => {
+  it("uses the OpenRouter default model and developer system prompt", async () => {
     const store = createSettingsStore({ storage: createMemoryStorage() });
     await store.save({
-      apiKeys: { openai: "sk-test" },
+      apiKeys: { openrouter: "sk-or-test" },
     });
 
     const fetchImpl = createFakeFetch(() =>
       chatCompletionResponse("a clearer prompt")
     );
+    const registry = createProviderRegistry();
     const engine = createAiEngine({
       loadSettings: () => store.load(),
-      registry: createProviderRegistry(),
+      registry,
     });
 
     const result = await engine.complete({
@@ -41,43 +42,45 @@ describe("AI engine (unit)", () => {
     assert.equal(result.text, "a clearer prompt");
     assert.equal(
       fetchImpl.calls[0].url,
-      "https://api.openai.com/v1/chat/completions"
+      "https://openrouter.ai/api/v1/chat/completions"
     );
     assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), {
-      model: "gpt-4o-mini",
+      model: registry.active().defaultModel,
       messages: expectedMessages("write email"),
     });
   });
 
   it("ignores user-stored provider, model, and system prompt values", async () => {
     const fetchImpl = createFakeFetch(() => chatCompletionResponse("ok"));
+    const registry = createProviderRegistry();
     const engine = createAiEngine({
       loadSettings: async () => ({
-        providerId: "openrouter",
+        providerId: "openai",
         apiKeys: { openai: "sk-test", openrouter: "sk-or-test" },
-        models: { openai: "gpt-user-model" },
+        models: { openrouter: "openai/gpt-user-model" },
         systemPrompt: "User override. Keep the meaning.",
       }),
-      registry: createProviderRegistry(),
+      registry,
     });
 
     await engine.complete({ userPrompt: "hello", fetchImpl });
 
     assert.equal(
       fetchImpl.calls[0].url,
-      "https://api.openai.com/v1/chat/completions"
+      "https://openrouter.ai/api/v1/chat/completions"
     );
     assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), {
-      model: "gpt-4o-mini",
+      model: registry.active().defaultModel,
       messages: expectedMessages("hello"),
     });
     assert.doesNotMatch(fetchImpl.calls[0].init.body, /User override/);
+    assert.doesNotMatch(fetchImpl.calls[0].init.body, /gpt-user-model/);
   });
 
   it("includes a developer-provided system prompt for every request", async () => {
     const fetchImpl = createFakeFetch(() => chatCompletionResponse("ok"));
     const engine = createAiEngine({
-      loadSettings: async () => ({ apiKeys: { openai: "sk-test" } }),
+      loadSettings: async () => ({ apiKeys: { openrouter: "sk-or-test" } }),
       registry: createProviderRegistry(),
       systemPrompt: "Stay concise.",
     });
@@ -90,26 +93,46 @@ describe("AI engine (unit)", () => {
     ]);
   });
 
-  it("can switch providers through engine config without changing the UI", async () => {
+  it("does not send requests to OpenAI when an OpenAI key is stored", async () => {
     const fetchImpl = createFakeFetch(() => chatCompletionResponse("ok"));
     const engine = createAiEngine({
       loadSettings: async () => ({
-        apiKeys: { openrouter: "sk-or-test" },
+        apiKeys: { openai: "sk-test", openrouter: "sk-or-test" },
       }),
       registry: createProviderRegistry(),
-      activeProviderId: "openrouter",
     });
 
     await engine.complete({ userPrompt: "hello", fetchImpl });
 
+    assert.equal(fetchImpl.calls.length, 1);
     assert.equal(
       fetchImpl.calls[0].url,
       "https://openrouter.ai/api/v1/chat/completions"
     );
+    assert.doesNotMatch(fetchImpl.calls[0].url, /api\.openai\.com/);
     assert.equal(
-      JSON.parse(fetchImpl.calls[0].init.body).model,
-      "openai/gpt-4o-mini"
+      fetchImpl.calls[0].init.headers.Authorization,
+      "Bearer sk-or-test"
     );
+  });
+
+  it("treats an OpenAI-only stored key as missing for OpenRouter", async () => {
+    const fetchImpl = createFakeFetch(() => chatCompletionResponse("ok"));
+    const engine = createAiEngine({
+      loadSettings: async () => ({
+        apiKeys: { openai: "sk-test" },
+      }),
+      registry: createProviderRegistry(),
+    });
+
+    try {
+      await engine.complete({ userPrompt: "hello", fetchImpl });
+      assert.fail("expected missing OpenRouter key to throw");
+    } catch (error) {
+      assert.ok(error instanceof AiError);
+      assert.equal(error.code, AI_ERROR_CODES.MISSING_API_KEY);
+      assert.equal(fetchImpl.calls.length, 0);
+    }
   });
 
   it("fails when the active provider has no model configured", async () => {
