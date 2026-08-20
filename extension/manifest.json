@@ -3,7 +3,7 @@
   "name": "Prompt Enhancer",
   "version": "0.1.0",
   "description": "Development foundation for the Prompt Enhancer Chrome extension.",
-  "permissions": ["sidePanel", "storage"],
+  "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
     "https://openrouter.ai/api/v1/*"
   ],
@@ -15,8 +15,17 @@
     "service_worker": "background/service-worker.js",
     "type": "module"
   },
-  "action": {},
-  "side_panel": {
-    "default_path": "sidepanel/sidepanel.html"
-  }
+  "action": {
+    "default_title": "Prompt Enhancer"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup/popup.html",
+        "content/floating-panel.js",
+        "content/floating-geometry.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

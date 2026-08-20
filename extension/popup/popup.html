@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prompt Enhancer</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <div class="popup">
+      <header class="popup-header">
+        <span class="status-dot" aria-hidden="true"></span>
+        <h1>Prompt Enhancer</h1>
+        <a id="open-settings" href="#">Settings</a>
+        <button type="button" id="close-panel" class="icon-button" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="popup-body">
+        <section class="field">
+          <label for="prompt-input">Your draft</label>
+          <textarea
+            id="prompt-input"
+            name="prompt"
+            placeholder="Paste or write a rough prompt"
+          ></textarea>
+        </section>
+
+        <button type="button" id="enhance-button" class="primary-action" data-state="clarify">
+          <svg class="icon icon-idle" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 4.5l.6 2.4L18 7.5l-2.4.6L15 10.5l-.6-2.4L12 7.5l2.4-.6L15 4.5zM8.5 3l.4 1.6L10.5 5l-1.6.4L8.5 7l-.4-1.6L6.5 5l1.6-.4L8.5 3zM12 13.5l.8 3.2 3.2.8-3.2.8L12 21.5l-.8-3.2-3.2-.8 3.2-.8L12 13.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+          </svg>
+          <svg class="icon icon-spinner" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3a9 9 0 1 1-9 9" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon icon-check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="enhance-button-label">Clarify</span>
+        </button>
+
+        <hr class="divider">
+
+        <section class="field result-field">
+          <label for="prompt-output">Refined</label>
+          <textarea
+            id="prompt-output"
+            name="enhancedPrompt"
+            readonly
+          ></textarea>
+        </section>
+
+        <div class="secondary-actions">
+          <button type="button" id="copy-button" class="secondary-action">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.75"/>
+              <path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+            Copy
+          </button>
+          <button type="button" id="edit-button" class="secondary-action">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 20l4.5-1.2L19 8.3a1.7 1.7 0 0 0-2.4-2.4L6.1 16.4 4 20z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Edit
+          </button>
+        </div>
+
+        <p id="enhance-status" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

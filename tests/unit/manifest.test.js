@@ -34,13 +34,14 @@ describe("manifest.json (unit)", () => {
     assert.equal(manifest.page_action, undefined);
   });
 
-  it("declares a side panel and the sidePanel permission", () => {
+  it("opens a floating panel from the toolbar instead of a popup or side panel", () => {
     const manifest = readManifest();
 
     assert.ok(Array.isArray(manifest.permissions));
-    assert.ok(manifest.permissions.includes("sidePanel"));
-    assert.equal(typeof manifest.side_panel?.default_path, "string");
-    assert.ok(manifest.side_panel.default_path.endsWith(".html"));
+    assert.ok(manifest.permissions.includes("scripting"));
+    assert.ok(manifest.permissions.includes("activeTab"));
+    assert.ok(!manifest.permissions.includes("sidePanel"));
+    assert.equal(manifest.side_panel, undefined);
     assert.equal(manifest.action?.default_popup, undefined);
   });
 

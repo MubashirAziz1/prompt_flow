@@ -1,13 +1,12 @@
+import { openFloatingPanel } from "./open-floating-panel.js";
+
 chrome.runtime.onInstalled.addListener(() => {
   // Foundation install hook.
 });
 
-async function enableOpenPanelOnActionClick() {
-  try {
-    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
-  } catch (error) {
-    console.error("Unable to open the side panel from the toolbar icon.", error);
-  }
-}
-
-enableOpenPanelOnActionClick();
+chrome.action.onClicked.addListener(async (tab) => {
+  await openFloatingPanel({
+    tab,
+    executeScript: (details) => chrome.scripting.executeScript(details),
+  });
+});

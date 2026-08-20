@@ -28,19 +28,19 @@ describe("unpacked extension load (e2e)", () => {
     });
   });
 
-  it("loads the side panel prompt UI with a textarea and action button", async () => {
+  it("loads the popup prompt UI with a draft field and clarify action", async () => {
     await withLoadedExtension(async ({ cdp, extensionId }) => {
-      const panelUrl = `chrome-extension://${extensionId}/sidepanel/sidepanel.html`;
-      const created = await cdp.send("Target.createTarget", { url: panelUrl });
-      const panel = await waitForTarget(
+      const popupUrl = `chrome-extension://${extensionId}/popup/popup.html`;
+      const created = await cdp.send("Target.createTarget", { url: popupUrl });
+      const popup = await waitForTarget(
         cdp,
         (target) =>
           target?.targetId === created.targetId ||
-          String(target?.url ?? "").startsWith(panelUrl)
+          String(target?.url ?? "").startsWith(popupUrl)
       );
 
       const { sessionId } = await cdp.send("Target.attachToTarget", {
-        targetId: panel.targetId,
+        targetId: popup.targetId,
         flatten: true,
       });
 
@@ -56,7 +56,10 @@ describe("unpacked extension load (e2e)", () => {
               output: Boolean(document.querySelector('#prompt-output')),
               button: Boolean(document.querySelector('#enhance-button')),
               buttonLabel: document.querySelector('#enhance-button')?.textContent?.trim() ?? '',
-              settingsLink: Boolean(document.querySelector('#open-settings'))
+              copy: Boolean(document.querySelector('#copy-button')),
+              edit: Boolean(document.querySelector('#edit-button')),
+              settingsLink: Boolean(document.querySelector('#open-settings')),
+              closeButton: Boolean(document.querySelector('#close-panel'))
             })`,
             returnByValue: true,
           },
@@ -72,8 +75,11 @@ describe("unpacked extension load (e2e)", () => {
       assert.equal(ui.textarea, true);
       assert.equal(ui.output, true);
       assert.equal(ui.button, true);
-      assert.ok(ui.buttonLabel.length > 0, "Action button is missing a label");
+      assert.match(ui.buttonLabel, /clarify/i);
+      assert.equal(ui.copy, true);
+      assert.equal(ui.edit, true);
       assert.equal(ui.settingsLink, true);
+      assert.equal(ui.closeButton, true);
     });
   });
 

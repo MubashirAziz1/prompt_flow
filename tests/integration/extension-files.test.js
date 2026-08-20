@@ -113,23 +113,29 @@ describe("extension files (integration)", () => {
     const source = readFileSync(workerPath, "utf8");
     assert.ok(source.length > 0, "service worker file is empty");
     assert.match(source, /chrome\.runtime\.onInstalled/);
+    assert.match(source, /chrome\.action\.onClicked/);
+    assert.match(source, /chrome\.scripting\.executeScript/);
+    assert.doesNotMatch(source, /chrome\.sidePanel/);
+    assert.doesNotMatch(source, /openPanelOnActionClick/);
   });
 
-  it("opens the side panel from the toolbar action click", () => {
+  it("exposes the panel page as a web-accessible iframe document", () => {
     const manifest = readManifest();
-    const source = readFileSync(
-      extensionFile(manifest.background.service_worker),
-      "utf8"
+    const resources = (manifest.web_accessible_resources ?? []).flatMap(
+      (entry) => entry.resources ?? []
     );
 
-    assert.match(source, /chrome\.sidePanel\.setPanelBehavior/);
-    assert.match(source, /openPanelOnActionClick:\s*true/);
-    assert.doesNotMatch(source, /openPanelOnActionIconClick/);
+    assert.ok(
+      resources.some(
+        (resource) =>
+          resource === "popup/popup.html" || resource.includes("popup/")
+      ),
+      "popup/popup.html must be web-accessible so the floating iframe can load it"
+    );
   });
 
-  it("side panel UI has a prompt textarea, action button, and external script", () => {
-    const manifest = readManifest();
-    const htmlPath = extensionFile(manifest.side_panel.default_path);
+  it("popup UI has a draft field, clarify action, and external script", () => {
+    const htmlPath = extensionFile("popup/popup.html");
     const html = readFileSync(htmlPath, "utf8");
 
     assert.match(html, /<textarea\b/i);
@@ -138,18 +144,29 @@ describe("extension files (integration)", () => {
     assert.doesNotMatch(html, /<script(?![^>]*\bsrc=)[^>]*>/i);
 
     const scriptSrc = html.match(/<script\b[^>]*\bsrc=["']([^"']+)["']/i)?.[1];
-    assert.ok(scriptSrc, "side panel is missing an external script");
+    assert.ok(scriptSrc, "popup is missing an external script");
     const stylesheetHref = html.match(
       /<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["']([^"']+)["']/i
     )?.[1];
-    assert.ok(stylesheetHref, "side panel is missing an external stylesheet");
+    assert.ok(stylesheetHref, "popup is missing an external stylesheet");
 
-    const panelDir = join(htmlPath, "..");
-    assert.ok(existsSync(join(panelDir, scriptSrc)), `Missing ${scriptSrc}`);
+    const popupDir = join(htmlPath, "..");
+    assert.ok(existsSync(join(popupDir, scriptSrc)), `Missing ${scriptSrc}`);
     assert.ok(
-      existsSync(join(panelDir, stylesheetHref)),
+      existsSync(join(popupDir, stylesheetHref)),
       `Missing ${stylesheetHref}`
     );
+  });
+
+  it("injects a floating panel that is not dismissed by page clicks", () => {
+    assert.equal(existsSync(extensionFile("content/loader.js")), true);
+    assert.equal(existsSync(extensionFile("content/floating-panel.js")), true);
+    const panel = readFileSync(extensionFile("content/floating-panel.js"), "utf8");
+    const loader = readFileSync(extensionFile("content/loader.js"), "utf8");
+    assert.doesNotMatch(panel, /document\.addEventListener\(\s*['"]click['"]/);
+    assert.doesNotMatch(loader, /document\.addEventListener\(\s*['"]click['"]/);
+    assert.match(panel, /attachShadow/);
+    assert.match(panel, /popup\/popup\.html/);
   });
 
   it("does not ship an OpenAI provider module", () => {
@@ -168,15 +185,15 @@ describe("extension files (integration)", () => {
     assert.doesNotMatch(config, /["']openai["']/);
   });
 
-  it("keeps provider HTTP logic out of the side panel UI", () => {
-    const panelJs = readFileSync(extensionFile("sidepanel/sidepanel.js"), "utf8");
-    const formJs = readFileSync(extensionFile("sidepanel/prompt-form.js"), "utf8");
+  it("keeps provider HTTP logic out of the popup UI", () => {
+    const popupJs = readFileSync(extensionFile("popup/popup.js"), "utf8");
+    const formJs = readFileSync(extensionFile("popup/prompt-form.js"), "utf8");
     const flowJs = readFileSync(
-      extensionFile("sidepanel/enhance-flow.js"),
+      extensionFile("popup/enhance-flow.js"),
       "utf8"
     );
 
-    for (const source of [panelJs, formJs, flowJs]) {
+    for (const source of [popupJs, formJs, flowJs]) {
       assert.doesNotMatch(source, /openai\.js/);
       assert.doesNotMatch(source, /openrouter\.js/);
       assert.doesNotMatch(source, /api\.openai\.com/);

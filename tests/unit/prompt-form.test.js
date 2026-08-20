@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { bindPromptForm } from "../../extension/sidepanel/prompt-form.js";
+import { bindPromptForm } from "../../extension/popup/prompt-form.js";
 
 function fakeControl(value = "") {
   return {

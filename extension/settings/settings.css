@@ -1,35 +1,30 @@
+.settings-body {
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+  background:
+    radial-gradient(
+      920px 280px at 50% -80px,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
 .settings-panel {
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.hint {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--muted);
-}
-
-select,
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 10px 12px;
+  max-width: 440px;
+  margin: 8vh auto 0;
+  padding: 28px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
 }
 
-select:focus,
-input:focus {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+.settings-panel .field {
+  flex: none;
 }
 
-.status {
-  min-height: 1.2em;
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--muted);
+#active-provider-label {
+  font-weight: 650;
+  color: var(--text);
 }
